@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Thai Alphabet World｜Tone Builder</title>
+<meta name="theme-color" content="#496b52">
+<meta name="description" content="Thai Tone Builder：泰語拼字組合、聲調判定、RTGS 與 IPA 學習工具。">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tone Builder">
+<style>
+:root{--cream:#fffaf0;--paper:#fffdf8;--green:#496b52;--deep:#294b38;--mint:#e5efe3;--line:#e8dfcf;--ink:#303b32}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:system-ui,"Noto Sans Thai","Leelawadee UI",sans-serif}
+header{text-align:center;padding:27px 16px;background:linear-gradient(135deg,#f8f0dd,#edf3e8);border-bottom:1px solid var(--line)}
+header small{letter-spacing:.15em;color:var(--green);font-weight:800}h1{color:var(--deep);font-size:clamp(28px,5vw,42px);margin:8px}header p{margin:0;color:#657267}
+main{max-width:1120px;margin:24px auto;padding:0 16px 42px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 24px #66583b0a}
+h2{font-size:19px;color:var(--deep);margin:0 0 15px}.field{margin-bottom:17px}label{display:block;font-weight:750;margin-bottom:8px}
+.hint{font-size:12px;color:#778078;margin-top:6px;line-height:1.6}
+.group{margin:12px 0}.group strong{display:block;font-size:13px;margin-bottom:7px;color:#526457}
+.keys{display:flex;flex-wrap:wrap;gap:7px}.key{min-width:42px;min-height:42px;border:1px solid #ded6c8;background:#fff;border-radius:11px;padding:7px 10px;font:inherit;font-size:21px;cursor:pointer}
+.key small{display:block;font-size:9px;color:#7b847b}.key.active{background:var(--mint);border:2px solid var(--green);color:var(--deep);font-weight:800}
+.vowelkey{font-size:18px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.preview{background:linear-gradient(145deg,#fff9eb,#edf4e9);border:1px solid #e6e3d3;border-radius:18px;padding:16px;text-align:center;margin:12px 0}
+.word{font-family:"Noto Sans Thai","Leelawadee UI",sans-serif;font-size:clamp(50px,9vw,76px);line-height:1.5;color:var(--deep);min-height:90px}
+.pron{font-size:15px;color:#526457;line-height:1.7}.result{background:var(--mint);border-radius:17px;padding:17px;margin-top:10px}
+.tone{font-size:27px;font-weight:850;color:var(--deep)}.detail{font-size:14px;line-height:1.7;margin-top:13px}
+.tag{display:inline-block;border-radius:99px;background:white;padding:4px 9px;margin:3px;border:1px solid #dce5d8;font-size:12px;color:#526457}
+.note{font-size:13px;line-height:1.65;color:#68736a;background:#fbf6e9;border-left:3px solid #c8b98c;padding:11px 13px;border-radius:8px;margin-top:15px}
+select,input{font:inherit;border:1px solid #d9d1c2;border-radius:10px;padding:9px;background:#fff;color:var(--ink);max-width:100%}
+button.action{border:0;border-radius:11px;padding:10px 14px;font:inherit;font-weight:750;cursor:pointer;background:var(--green);color:white;margin:4px 5px 0 0}
+button.light{background:white;color:var(--ink);border:1px solid var(--line)}
+.charts{grid-column:1/-1}.chartgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.chart{border:1px solid var(--line);border-radius:14px;padding:9px;background:white;text-align:center}.chart img{width:100%;height:auto;display:block}.chart b{font-size:13px}
+
+.tone-chart-panel{margin:12px 0 15px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:15px;text-align:center}
+.tone-chart-panel img{display:block;width:100%;max-width:520px;height:auto;margin:5px auto 0}
+#rightPreview{margin-top:13px}
+@media(min-width:851px){#rightPreview .word{font-size:clamp(42px,5vw,62px);min-height:76px}}
+.exception{background:#fbf6e9;border-radius:12px;padding:12px;margin-top:10px}.exception summary{cursor:pointer;font-weight:750;color:var(--deep)}
+footer{grid-column:1/-1;text-align:center;color:#7b8178;font-size:12px}
+@media(max-width:850px){main{grid-template-columns:1fr}.charts,footer{grid-column:auto}.chartgrid{grid-template-columns:repeat(2,1fr)}}
+
+/* PWA / responsive refinements */
+html{min-height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh;padding-bottom:env(safe-area-inset-bottom)}
+button,.key,summary{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button:focus-visible,.key:focus-visible,summary:focus-visible{outline:3px solid #91ad96;outline-offset:2px}
+.key{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+main{width:min(100%,1120px)}
+.panel{min-width:0}
+.word{overflow-wrap:anywhere}
+.preview,.result,.tone-chart-panel{min-width:0}
+.tone-chart-panel img,.chart img{object-fit:contain}
+@media(max-width:850px){
+  header{padding:22px 14px}
+  main{grid-template-columns:minmax(0,1fr);gap:12px;margin:12px auto;padding:0 10px 28px}
+  .panel{padding:15px;border-radius:16px}
+  h2{font-size:18px}
+  .charts,footer{grid-column:auto}
+  .chartgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .chart{padding:7px}
+  .row2{grid-template-columns:minmax(0,1fr)}
+  .keys{gap:6px}
+  .key{min-width:44px;min-height:44px;padding:7px 9px}
+  .word{font-size:clamp(48px,14vw,68px);min-height:72px}
+  .tone{font-size:clamp(22px,6vw,27px)}
+  .tone-chart-panel img{max-width:100%}
+}
+@media(max-width:380px){
+  main{padding-left:8px;padding-right:8px}
+  .panel{padding:12px}
+  .chartgrid{grid-template-columns:1fr}
+  .key{min-width:42px;min-height:42px}
+}
+@media(min-width:851px){
+  main{grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr)}
+}
+
+</style></head><body>
+<header><small>THAI ALPHABET WORLD · LEARNING LAB</small><h1>Tone Builder</h1><p>按鍵式拼字組合 · 前引字與複合聲母 · 聲調判定與對應運圖</p></header>
+<main>
+<section class="panel">
+<h2>① 組合你的泰語音節</h2>
+<div class="group"><strong>聲母類別與聲母按鍵</strong><div id="initialKeys"></div><div class="hint" id="initialInfo"></div></div>
+<div class="group"><strong>前引字／引導子音（可不選）</strong><div id="leadKeys"></div><div class="hint">支援框架：ห นำ、อ นำ；可再擴充其他前引字規則。</div></div>
+<div class="group"><strong>複合聲母／子音連綴（可不選）</strong><div id="clusterKeys"></div><div class="hint">此處先提供常見真複合聲母組合；拼寫合法性與非發音引導子音將分開處理。</div></div>
+<div class="group"><strong>母音按鍵</strong><div id="vowelKeys"></div></div>
+<div class="row2">
+<div class="group"><strong>韻尾按鍵</strong><div id="finalKeys"></div></div>
+<div class="group"><strong>聲調符號</strong><div id="markKeys"></div></div>
+</div>
+<button class="action" id="reset">重設</button><button class="action light" id="example">載入教學例子</button>
+<details class="exception"><summary>特殊拼字／拼字例外規則（擴充預留）</summary>
+<p class="hint">此區預留給未來加入固定拼寫例外、詞彙層級例外及自訂判調規則。現階段不會自動套用未經確認的例外。</p>
+<label>例外規則資料（JSON）</label><textarea id="exceptionJson" rows="4" style="width:100%">[]</textarea>
+<div class="hint">資料欄位可規劃為 pattern、scope、toneClassOverride、toneOverride、notes；需經規則校驗後才啟用。</div>
+</details>
+</section>
+<aside class="panel">
+<h2>② 自動聲調判定</h2>
+<div class="result" aria-live="polite"><div class="hint">判定結果</div><div class="tone" id="tone">第一聲｜中平調</div><div id="toneValue">調值：[33]</div></div>
+<div class="preview"><div class="hint">拼字預覽</div><div class="word" id="word">กา</div><div class="pron" id="roman">羅馬拼音：kaa</div><div class="pron" id="ipa">IPA：/kaː/</div><div class="hint" id="meta"></div></div>
+<div class="tone-chart-panel" id="activeToneChart" aria-live="polite"><div class="hint">對應聲調運圖</div><img id="activeToneImage" src="tone_contours/tone_1_33.png" alt="第一聲中平調 [33] 聲調運圖"></div>
+<div class="detail" id="reason"></div><div class="detail"><b>判定依據</b><div class="hint" id="rule"></div></div>
+<div class="note"><b>重要說明</b><br>目前提供的是規則引擎原型。前引字、真複合聲母與拼寫例外會先分層處理；尚未確認的規則不會猜測套用。轉寫標準已設定為 RTGS（泰國皇家轉寫系統）＋IPA；目前介面保留雙欄，實際音節轉寫需完成並校驗轉寫引擎後才會輸出。</div>
+</aside>
+<section class="panel charts"><h2>③ 五種聲調運圖</h2><div class="hint">依照你提供的調值表繪製；縱軸為 1–5 音高級別，橫軸為發音時間。靜態圖片，沒有動畫。</div>
+<div class="chartgrid">
+<div class="chart"><b>第一聲 [33]</b><img src="tone_contours/tone_1_33.png" alt="第一聲中平調值33"/></div>
+<div class="chart"><b>第二聲 [21]</b><img src="tone_contours/tone_2_21.png" alt="第二聲低調值21"/></div>
+<div class="chart"><b>第三聲 [51]</b><img src="tone_contours/tone_3_51.png" alt="第三聲高降調值51"/></div>
+<div class="chart"><b>第四聲 [45]</b><img src="tone_contours/tone_4_45.png" alt="第四聲高調值45"/></div>
+<div class="chart"><b>第五聲 [215]</b><img src="tone_contours/tone_5_215.png" alt="第五聲升調值215"/></div>
+</div></section>
+<footer>Prototype 0.2 · 按鍵式選字與規則擴充架構；轉寫標準已設定為 RTGS＋IPA；完整音節轉寫引擎待完成。</footer>
+</main>
+<script>
+const initialGroups={
+"中子音":["ก","จ","ฎ","ฏ","ด","ต","บ","ป","อ"],
+"高子音":["ข","ฃ","ฉ","ฐ","ถ","ผ","ฝ","ศ","ษ","ส","ห"],
+"低子音":["ค","ฅ","ฆ","ง","ช","ซ","ฌ","ญ","ฑ","ฒ","ณ","ท","ธ","น","พ","ฟ","ภ","ม","ย","ร","ล","ว"]
+};
+const classOf=Object.fromEntries(Object.entries(initialGroups).flatMap(([g,arr])=>arr.map(c=>[c,g])));
+const vowels=[["า","{C}า","long","aa","aː"],["ะ","{C}ะ","short","a","a"],["ิ","{C}ิ","short","i","i"],["ี","{C}ี","long","ii","iː"],["ึ","{C}ึ","short","ue","ɯ"],["ือ","{C}ือ","long","ue","ɯː"],["ุ","{C}ุ","short","u","u"],["ู","{C}ู","long","uu","uː"],["เ-ะ","เ{C}ะ","short","e","e"],["เ-","เ{C}","long","ee","eː"],["แ-ะ","แ{C}ะ","short","ae","ɛ"],["แ-","แ{C}","long","aae","ɛː"],["โ-ะ","โ{C}ะ","short","o","o"],["โ-","โ{C}","long","oo","oː"],["เ-อ","เ{C}อ","long","oe","ɤː"],["เ-ีย","เ{C}ีย","long","ia","ia"],["เ-ือ","เ{C}ือ","long","uea","ɯa"],["-ัว","{C}ัว","long","ua","ua"]];
+const finals=[["無","", "open"],["ง","ง","live"],["น","น","live"],["ม","ม","live"],["ย","ย","live"],["ว","ว","live"],["ก","ก","dead"],["ด","ด","dead"],["บ","บ","dead"]];
+const marks=[["無",""],["่","่"],["้","้"],["๊","๊"],["๋","๋"]];
+const leads=[["無",""],["ห นำ","ห"],["อ นำ","อ"]];
+const clusters=["無","กร","กล","กว","คร","คล","คว","ปร","ปล","พล","พร","ตร"];
+let state={initial:"ก",lead:"",cluster:"無",vowel:0,final:0,mark:""};
+function makeButtons(target,items,active,cb,cls=""){let root=document.getElementById(target);root.innerHTML="";let wrap=document.createElement("div");wrap.className="keys";items.forEach(([label,val,extra])=>{let b=document.createElement("button");b.className="key "+cls+(val===active?" active":"");b.textContent=label;b.onclick=()=>cb(val);wrap.append(b)});root.append(wrap)}
+function drawInitial(){let root=document.getElementById("initialKeys");root.innerHTML="";Object.entries(initialGroups).forEach(([g,arr])=>{let box=document.createElement("div");box.className="group";let title=document.createElement("strong");title.textContent=g;box.append(title);let keys=document.createElement("div");keys.className="keys";arr.forEach(c=>{let b=document.createElement("button");b.className="key"+(state.initial===c?" active":"");b.textContent=c;b.onclick=()=>{state.initial=c;update()};keys.append(b)});box.append(keys);root.append(box)})}
+function set(k,v){state[k]=v;update()}
+function render(){drawInitial();makeButtons("leadKeys",leads.map(x=>[x[0],x[1]]),state.lead,v=>set("lead",v));makeButtons("clusterKeys",clusters.map(x=>[x,x]),state.cluster,v=>set("cluster",v));makeButtons("vowelKeys",vowels.map((x,i)=>[x[0],String(i)]),String(state.vowel),v=>set("vowel",+v),"vowelkey");makeButtons("finalKeys",finals.map((x,i)=>[x[0],String(i)]),String(state.final),v=>set("final",+v));makeButtons("markKeys",marks,state.mark,v=>set("mark",v))}
+function compose(){let c=state.cluster!=="無"?state.cluster:state.initial;let v=vowels[state.vowel],f=finals[state.final];let body=v[1].replace("{C}",c)+f[1]+state.mark;return (state.lead||"")+body}
+const rowsToneRules=[{"聲母類別":"中子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"無聲調符號","判定結果":"平聲｜中平調","App調值":"[33]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"่","判定結果":"第一聲｜低調","App調值":"[21]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"้","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"๊","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"๋","判定結果":"第四聲｜升調","App調值":"[215]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"無聲調符號","判定結果":"第二聲｜低調","App調值":"[21]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"中子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"่","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"中子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"้","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"中子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"๊","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"中子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"๋","判定結果":"不存在","App調值":null,"教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"無聲調符號","判定結果":"平聲｜中平調","App調值":"[33]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"่","判定結果":"第一聲｜低調","App調值":"[21]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"้","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"๊","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"๋","判定結果":"第四聲｜升調","App調值":"[215]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"無聲調符號","判定結果":"第一聲｜低調","App調值":"[21]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"่","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"้","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"๊","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":null},{"聲母類別":"中子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"๋","判定結果":"第四聲｜升調","App調值":"[215]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"無聲調符號","判定結果":"第四聲｜升調","App調值":"[215]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"่","判定結果":"第一聲｜低調","App調值":"[21]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"้","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"๋","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"無聲調符號","判定結果":"第四聲｜升調","App調值":"[215]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"่","判定結果":"第一聲｜低調","App調值":"[21]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"้","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"๋","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"高子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"無聲調符號","判定結果":"第一聲｜低調","App調值":"[21]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"高子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"่","判定結果":"不存在","App調值":null,"教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"高子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"้","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"高子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"高子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"๋","判定結果":"不存在","App調值":null,"教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"無聲調符號","判定結果":"第一聲｜低調","App調值":"[21]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"่","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"้","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"高子音","母音長短":"長／短皆可","尾音類型":"濁尾音 ป ต ก","聲調符號":"๋","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"無聲調符號","判定結果":"平聲｜中平調","App調值":"[33]","教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"่","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"้","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音或-ำ, -ไ, -ใ,เ-า","尾音類型":"無尾音","聲調符號":"๋","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"低子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"無聲調符號","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"่","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"้","判定結果":"不存在","App調值":null,"教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"一般短母音","尾音類型":"無尾音","聲調符號":"๋","判定結果":"第四聲｜升調","App調值":"[215]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"無聲調符號","判定結果":"平聲｜中平調","App調值":"[33]","教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"่","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"้","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長／短皆可","尾音類型":"清尾音 ง น ม ย ว","聲調符號":"๋","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"低子音","母音長短":"短母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"無聲調符號","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"短母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"่","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"短母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"้","判定結果":"不存在","App調值":null,"教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"短母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"短母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"๋","判定結果":"第四聲｜升調","App調值":"[215]","教材依據／備註":"不含-ำ, -ไ, -ใ,เ-า"},{"聲母類別":"低子音","母音長短":"長母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"無聲調符號","判定結果":"第二聲｜高降調","App調值":"[51]","教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"่","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"้","判定結果":"第三聲｜高調","App調值":"[45]","教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"๊","判定結果":"不存在","App調值":null,"教材依據／備註":null},{"聲母類別":"低子音","母音長短":"長母音","尾音類型":"濁尾音 ป ต ก","聲調符號":"๋","判定結果":"第四聲｜升調","App調值":"[215]","教材依據／備註":null},{"聲母類別":"前引字","母音長短":"ง ญ น ม ย ร ล ว","尾音類型":"ห นำ","聲調符號":"無聲調符號","判定結果":"以 ห 的高子音類別控制","App調值":null,"教材依據／備註":"教材列出八個低子音"},{"聲母類別":"前引字","母音長短":"อย่า／อยู่／อยาก／อย่าง","尾音類型":"อ นำ","聲調符號":"無聲調符號","判定結果":"固定詞彙例外","App調值":null,"教材依據／備註":"不可泛化至所有 อ นำ + ย"},{"聲母類別":"連音","母音長短":"ปล กล ขล ผล พล คล กว ขว คว ตร กร ปร พร คร ขร","尾音類型":"15 組","聲調符號":"無聲調符號","判定結果":"第二子音屬 ว／ล／ร 系列","App調值":null,"教材依據／備註":"依教材圖示辨讀，需逐詞驗證"}];
+function update(){
+ render();
+ const cls=classOf[state.initial], v=vowels[state.vowel], f=finals[state.final], m=state.mark;
+ const short=v[2]==="short", long=v[2]==="long";
+ const special=["ไ","ใ","เ-า","-ำ"].includes(v[0]);
+ const live=["ง","น","ม","ย","ว"], dead=["ก","ด","บ"];
+ const hasLive=live.includes(f[0]), hasDead=dead.includes(f[0]);
+ const toneByValue={"[33]":"mid","[21]":"low","[51]":"fall","[45]":"high","[215]":"rise"};
+ const toneNames={mid:["第一聲｜中平調","[33]"],low:["第二聲｜低調","[21]"],fall:["第三聲｜高降調","[51]"],high:["第四聲｜高調","[45]"],rise:["第五聲｜升調","[215]"]};
+ const chartFiles={mid:"tone_1_33.png",low:"tone_2_21.png",fall:"tone_3_51.png",high:"tone_4_45.png",rise:"tone_5_215.png"};
+ const chartTitles={mid:"第一聲中平調 [33]",low:"第二聲低調 [21]",fall:"第三聲高降調 [51]",high:"第四聲高調 [45]",rise:"第五聲升調 [215]"};
+ let controller=cls, controllerNote="", leadSpecial=false;
+ const hMap={"ง":"หง","ญ":"หญ","น":"หน","ม":"หม","ย":"หย","ร":"หร","ล":"หล","ว":"หว"};
+ if(state.lead==="ห" && hMap[state.initial]){controller="高子音";controllerNote=`ห นำ：${hMap[state.initial]}，由 ห 的高子音類別控制聲調。`;}
+ else if(state.lead==="อ" && state.initial==="ย"){controller="中子音";leadSpecial=true;controllerNote="อ นำ ย 僅適用教材列出的固定詞 อย่า／อยู่／อยาก／อย่าง。";}
+ const clustersAllowed=["ปล","กล","ขล","ผล","พล","คล","กว","ขว","คว","ตร","กร","ปร","พร","คร","ขร"];
+ if(state.cluster!=="無"){const first=state.cluster[0];controller=classOf[first]||cls;controllerNote=`複合聲母 ${state.cluster}：依教材列出的組合處理。`;}
+ const finalKey=hasLive?"清尾音 ง น ม ย ว":hasDead?"濁尾音 ป ต ก":"無尾音";
+ const vowelKey=special?"長母音或-ำ, -ไ, -ใ,เ-า":short?"一般短母音":"長母音";
+ const markKey=m||"無聲調符號";
+ let matched=null,tone=null,reason="";
+ if(!leadSpecial){
+   matched=rowsToneRules.find(r=>{
+     if(r["聲母類別"]!==controller || r["聲調符號"]!==markKey || r["尾音類型"]!==finalKey) return false;
+     const k=r["母音長短"];
+     return k==="長／短皆可" || k===vowelKey || (k==="短母音"&&short) || (k==="長母音"&&long) || (k.startsWith("長母音或") && (long || special));
+   });
+ }
+ if(matched){
+   const val=matched["App調值"];
+   tone=matched["判定結果"]==="不存在"||!val?null:toneByValue[val]||null;
+   reason=`依最新 11_教材規則矩陣查表：${matched["判定結果"]||"未標示"}${val?" "+val:""}。`;
+   if(!tone) reason+=" 此條件未提供可用調值，因此不猜測。";
+ }else{
+   reason=leadSpecial?"อ นำ ย：請以完整固定詞彙判定。":"找不到符合目前選項的矩陣資料列，暫不判定。";
+ }
+ if(state.cluster!=="無"&&!clustersAllowed.includes(state.cluster)){tone=null;reason="此複合聲母不在教材列出的連音組合中，暫不判調。";}
+ document.getElementById("word").textContent=compose();
+ document.getElementById("roman").textContent="RTGS 羅馬拼音：轉寫引擎待完成";
+ document.getElementById("ipa").textContent="IPA：轉寫引擎待完成";
+ document.getElementById("initialInfo").textContent=state.initial+"｜"+cls+"；判調控制類別："+controller;
+ document.getElementById("tone").textContent=tone?toneNames[tone][0]:"需補充詞彙／規則資料";
+ document.getElementById("toneValue").textContent="調值："+(tone?toneNames[tone][1]:"尚未判定");
+ const box=document.getElementById("activeToneChart"),img=document.getElementById("activeToneImage");
+ if(tone){box.style.display="block";img.src="tone_contours/"+chartFiles[tone];img.alt=chartTitles[tone]+"聲調運圖";}else box.style.display="none";
+ document.getElementById("reason").innerHTML=`<span class="tag">${controller}</span><span class="tag">${short?"短母音":"長母音"}</span><span class="tag">${hasLive?"清尾音":hasDead?"濁尾音":"無尾音"}</span><span class="tag">${m||"無調號"}</span><p>${reason}</p><p>${controllerNote}</p>`;
+ document.getElementById("rule").textContent="規則來源：你最新上傳的 11_教材規則矩陣。依子音類別、母音長短、尾音類型及聲調符號查表；不存在或空白調值不會自動推測。";
+}
+document.getElementById("reset").onclick=()=>{state={initial:"ก",lead:"",cluster:"無",vowel:0,final:0,mark:""};update()};
+document.getElementById("example").onclick=()=>{state={initial:"น",lead:"ห",cluster:"無",vowel:0,final:0,mark:""};update()};
+update();
+</script>
+<script>
+/* Progressive enhancement: service worker is registered only on secure origins. */
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js", { scope: "./" })
+      .catch(err => console.warn("Service worker registration failed:", err));
+  });
+}
+</script>
+
+</body></html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="112" fill="#fffaf0"/>
+<rect x="30" y="30" width="452" height="452" rx="94" fill="#e5efe3" stroke="#496b52" stroke-width="14"/>
+<circle cx="256" cy="256" r="152" fill="#fffdf8" stroke="#d8e4d6" stroke-width="8"/>
+<text x="256" y="326" text-anchor="middle" font-size="230" font-family="Noto Sans Thai,Leelawadee UI,sans-serif" fill="#294b38">ก</text>
+<circle cx="390" cy="118" r="24" fill="#d9b96e"/>
+</svg>
